@@ -1,0 +1,6 @@
+flask
+flask-sqlalchemy
+flask-cors
+pdfplumber
+python-docx
+werkzeug

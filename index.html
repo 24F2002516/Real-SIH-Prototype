@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>GeM Compliance Intelligence</title>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<style>
+:root{
+ --navy:#102a43;--navy2:#173f5f;--green:#17824b;--green2:#e8f6ee;
+ --orange:#e76f2f;--blue:#3f78a8;--bg:#f4f7f9;--card:#fff;--line:#dce5ea;
+ --text:#203040;--muted:#6d7b86;--danger:#c94b45;--warn:#c48721;
+}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,system-ui,sans-serif;background:var(--bg);color:var(--text)}
+button,input,textarea,select{font:inherit}.app{min-height:100vh}
+.topbar{height:68px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 28px;position:sticky;top:0;z-index:20}
+.brand{display:flex;align-items:center;gap:12px;min-width:285px}.brandmark{width:38px;height:38px;border-radius:11px;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:800}
+.brand h1{font-size:17px;margin:0;color:var(--navy)}.brand small{color:var(--muted);font-size:10px}
+.nav{display:flex;gap:4px;flex:1}.nav button{border:0;background:transparent;color:#607080;padding:10px 14px;border-radius:9px;cursor:pointer;font-weight:600;font-size:13px}.nav button.active,.nav button:hover{background:#edf4f7;color:var(--navy)}
+.actions{display:flex;align-items:center;gap:9px}.lang{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 10px;color:var(--navy);font-size:12px}
+.ai-pill{background:var(--green2);color:var(--green);padding:8px 11px;border-radius:999px;font-size:11px;font-weight:800}
+.shell{display:grid;grid-template-columns:225px 1fr;min-height:calc(100vh - 68px)}
+.sidebar{background:var(--navy);color:#dce9f0;padding:22px 14px}.side-label{font-size:10px;letter-spacing:1.3px;color:#8fa8b7;margin:10px 12px}
+.side-btn{width:100%;border:0;background:transparent;color:#dce9f0;text-align:left;padding:11px 12px;border-radius:8px;margin:2px 0;cursor:pointer}.side-btn.active,.side-btn:hover{background:#214a67}
+.side-note{margin:22px 10px 0;padding:13px;border:1px solid #31556c;border-radius:10px;background:#173a55;font-size:11px;line-height:1.5;color:#c3d5df}
+main{padding:25px 30px;max-width:1450px;width:100%;margin:auto}
+.pagehead{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}.eyebrow{color:var(--green);font-size:11px;font-weight:800;letter-spacing:1.2px}.pagehead h2{margin:5px 0 4px;font-family:Georgia,serif;font-size:28px;color:var(--navy)}.pagehead p{margin:0;color:var(--muted);font-size:13px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.grid2{display:grid;grid-template-columns:1.3fr .7fr;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:18px;box-shadow:0 3px 12px rgba(16,42,67,.045)}
+.stat{position:relative;overflow:hidden}.stat .label{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.7px}.stat .num{font-size:28px;font-weight:800;color:var(--navy);margin:7px 0}.stat .sub{font-size:11px;color:var(--muted)}.stat:after{content:"";position:absolute;width:55px;height:55px;border-radius:50%;right:-15px;top:-15px;background:#eef6f3}
+.cardhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}.card h3{margin:0;font-size:15px;color:var(--navy)}.small{font-size:11px;color:var(--muted)}
+.btn{border:0;border-radius:8px;padding:9px 13px;background:var(--navy);color:#fff;cursor:pointer;font-weight:700;font-size:12px}.btn.green{background:var(--green)}.btn.light{background:#edf3f6;color:var(--navy)}.btn.orange{background:var(--orange)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.flow{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}.flowbox{border:1px solid #cfdde3;border-radius:10px;padding:12px 7px;text-align:center;background:#fbfcfd;position:relative}.flowbox b{display:block;color:var(--green);font-size:11px}.flowbox span{display:block;font-size:11px;font-weight:700;margin-top:5px}.flowbox:not(:last-child):after{content:"→";position:absolute;right:-11px;top:33px;color:#78909c;font-weight:900;z-index:2}
+.barrow{display:grid;grid-template-columns:125px 1fr 45px;align-items:center;gap:9px;margin:12px 0;font-size:11px}.bar{height:9px;border-radius:99px;background:#edf1f3;overflow:hidden}.bar i{display:block;height:100%;border-radius:99px}.greenbar{background:var(--green)}.redbar{background:var(--danger)}.orangebar{background:var(--orange)}
+.donut{width:145px;height:145px;border-radius:50%;margin:4px auto 13px;display:grid;place-items:center;background:conic-gradient(var(--green) 0 0%,#e6ebee 0)}.donut .inner{width:96px;height:96px;background:#fff;border-radius:50%;display:grid;place-items:center;text-align:center}.donut strong{font-size:24px;color:var(--navy)}.legend{display:flex;justify-content:center;gap:12px;font-size:10px;color:var(--muted)}.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
+table{width:100%;border-collapse:collapse}th,td{padding:11px 9px;border-bottom:1px solid #edf1f3;text-align:left;font-size:11px}th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}.click{cursor:pointer}.click:hover{background:#f8fafb}
+.badge{padding:4px 8px;border-radius:999px;font-size:9px;font-weight:800}.COMPLIANT{background:#e4f5eb;color:#167342}.NON_COMPLIANT{background:#fce8e7;color:#ad3935}.NEEDS_REVIEW{background:#fff2d9;color:#9a6810}
+input,textarea,select{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px;background:#fff;color:var(--text);outline:none}input:focus,textarea:focus,select:focus{border-color:#7da5bd;box-shadow:0 0 0 2px #e7f0f5}label{font-size:11px;font-weight:700;color:var(--muted);display:block;margin:11px 0 5px}
+.req{display:grid;grid-template-columns:1.4fr 1fr .7fr .5fr auto;gap:7px;align-items:center;margin-bottom:7px}.check{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)}.check input{width:auto}
+.result{display:grid;grid-template-columns:1.2fr .25fr 2fr;gap:12px;padding:12px 0;border-bottom:1px solid #edf1f3;font-size:11px}.pass{color:var(--green);font-weight:800}.fail{color:var(--danger);font-weight:800}
+.scorebox{display:flex;align-items:center;gap:18px}.scorecircle{width:90px;height:90px;border-radius:50%;display:grid;place-items:center;background:#edf5f0;border:8px solid #8fc7a6;color:var(--navy);font-weight:900;font-size:20px}
+.chat{height:600px;display:grid;grid-template-rows:auto 1fr auto;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#fff}.chathead{background:var(--navy);color:#fff;padding:15px 18px;display:flex;justify-content:space-between}.chathead small{color:#b9ced9}.messages{padding:18px;overflow:auto;background:#f7fafb}.msg{max-width:78%;padding:10px 12px;border-radius:12px;margin-bottom:11px;font-size:12px;line-height:1.5}.bot{background:#fff;border:1px solid var(--line)}.user{background:var(--navy);color:#fff;margin-left:auto}.chatinput{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}.chatinput input{flex:1}
+.quick{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}.quick button{border:1px solid #cfdde3;background:#fff;color:var(--navy);padding:7px 9px;border-radius:999px;font-size:10px;cursor:pointer}
+.empty{padding:25px;text-align:center;color:var(--muted);font-size:12px}.notice{padding:10px 12px;border-left:3px solid var(--green);background:#f0f8f3;font-size:11px;color:#426052;border-radius:5px}
+@media(max-width:1000px){.shell{grid-template-columns:1fr}.sidebar{display:none}.grid4{grid-template-columns:repeat(2,1fr)}.grid2,.grid3{grid-template-columns:1fr}.flow{grid-template-columns:repeat(3,1fr)}.flowbox:nth-child(3):after,.flowbox:nth-child(6):after{display:none}.topbar{padding:0 14px}.nav{display:none}}
+@media(max-width:620px){main{padding:17px}.grid4{grid-template-columns:1fr}.flow{grid-template-columns:repeat(2,1fr)}.req{grid-template-columns:1fr}.brand{min-width:0}.brand h1{font-size:14px}}
+
+
+/* ---------- SIH presentation polish ---------- */
+html,body,#app{width:100%;min-width:0;min-height:100%;overflow-x:hidden}
+body{min-height:100dvh}
+main{max-width:none;min-width:0}
+.shell{width:100%;min-height:calc(100dvh - 68px)}
+.topbar{width:100%;backdrop-filter:blur(12px)}
+.kpi-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+.metric-chart{display:grid;grid-template-columns:1fr;gap:9px}.metric-row{display:grid;grid-template-columns:125px 1fr 45px;align-items:center;gap:9px;font-size:11px}.metric-row .bar{height:10px}
+.trend{height:170px;display:flex;align-items:flex-end;gap:10px;padding:12px 8px 0;border-bottom:1px solid var(--line)}.trend-col{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px}.trend-bar{width:70%;max-width:38px;border-radius:7px 7px 0 0;background:linear-gradient(to top,#17824b,#77b995);min-height:8px}.trend-col span{font-size:9px;color:var(--muted)}
+.analysis-overlay{position:fixed;inset:0;background:rgba(8,25,38,.72);backdrop-filter:blur(8px);z-index:100;display:grid;place-items:center;padding:20px}.analysis-modal{width:min(650px,100%);background:#fff;border-radius:20px;box-shadow:0 25px 80px rgba(0,0,0,.3);padding:26px}.analysis-title{display:flex;align-items:center;gap:13px;margin-bottom:20px}.ai-orb{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#e9f6ef;color:var(--green);font-weight:900;box-shadow:0 0 0 8px #f2faf5}.analysis-step{display:grid;grid-template-columns:30px 1fr 28px;gap:10px;align-items:center;padding:13px 0;border-bottom:1px solid #edf1f3;font-size:12px}.analysis-step .stepdot{width:25px;height:25px;border-radius:50%;display:grid;place-items:center;background:#edf3f6;color:#78909c;font-size:10px;font-weight:900}.analysis-step.done .stepdot{background:#e4f5eb;color:var(--green)}.analysis-step.active .stepdot{background:#e8f1f6;color:var(--navy);animation:pulse 1s infinite}.analysis-step .state{font-size:16px}.analysis-foot{margin-top:17px;padding:12px;background:#f5f9fa;border-radius:10px;font-size:10px;color:var(--muted)}
+.score-hero{display:grid;grid-template-columns:145px 1fr;gap:20px;align-items:center}.score-ring{width:145px;height:145px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--green) 0 87%,#e7edef 87% 100%);position:relative}.score-ring:after{content:'';position:absolute;inset:12px;border-radius:50%;background:#fff}.score-ring .score-num{position:relative;z-index:2;text-align:center;font-size:30px;font-weight:900;color:var(--navy)}.score-ring .score-num small{display:block;font-size:9px;color:var(--muted);font-weight:700}.explain-box{background:#f8fbfc;border:1px solid var(--line);border-radius:11px;padding:13px;margin-top:10px}.evidence-source{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;background:#eef5f7;border-radius:7px;font-size:9px;color:var(--navy);font-weight:700;margin:4px 4px 0 0}
+.mobile-nav{display:none}
+@keyframes pulse{50%{transform:scale(1.08);opacity:.7}}
+@media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(3,1fr)}.brand{min-width:245px}.nav button{padding:9px 8px}}
+@media(max-width:760px){.topbar{height:auto;min-height:64px;padding:10px 13px;flex-wrap:wrap;gap:8px}.brand{flex:1;min-width:210px}.actions{margin-left:auto}.ai-pill{display:none}.shell{display:block;min-height:calc(100dvh - 64px)}.sidebar{display:none}main{padding:18px 14px}.nav{display:none}.kpi-grid{grid-template-columns:repeat(2,1fr)}.ai-banner{grid-template-columns:1fr}.ai-actions{justify-content:flex-start}.grid4,.grid3,.grid2{grid-template-columns:1fr}.flow{grid-template-columns:repeat(2,1fr)}.flowbox:not(:last-child):after{display:none}.trend{height:145px}.metric-row{grid-template-columns:100px 1fr 30px}.score-hero{grid-template-columns:1fr}.score-ring{margin:auto}.analysis-modal{padding:20px}}
+@media(max-width:440px){.kpi-grid{grid-template-columns:1fr}.brand h1{font-size:13px}.brand small{font-size:9px}.actions{width:100%;justify-content:flex-end}.lang{padding:7px 8px}.pagehead h2{font-size:23px}.flow{grid-template-columns:1fr}.req{grid-template-columns:1fr}.chat{height:calc(100dvh - 155px);min-height:500px}.chatinput{padding:9px}.chatinput .btn{padding:9px 10px}}
+/* ---------- Professional AI workspace layer ---------- */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.kpi{padding:16px;border:1px solid var(--line);background:#fff;border-radius:12px;position:relative;overflow:hidden}
+.kpi .icon{float:right;width:32px;height:32px;border-radius:9px;background:#edf4f7;display:grid;place-items:center;color:var(--navy);font-weight:900}
+.kpi .num{font-size:25px;font-weight:900;color:var(--navy);margin-top:8px}.kpi .lbl{font-size:10px;color:var(--muted);font-weight:800;letter-spacing:.7px;text-transform:uppercase}
+.ai-banner{display:grid;grid-template-columns:1.3fr .7fr;gap:14px;background:linear-gradient(110deg,#102a43,#1b5068);color:#fff;border-radius:14px;padding:20px;margin-bottom:16px;position:relative;overflow:hidden}
+.ai-banner:after{content:"";position:absolute;width:180px;height:180px;border:1px solid rgba(255,255,255,.12);border-radius:50%;right:-50px;top:-70px}
+.ai-banner h3{margin:0 0 5px;font-family:Georgia,serif;font-size:21px}.ai-banner p{margin:0;color:#c8d9e2;font-size:11px;line-height:1.6}.ai-chip{display:inline-block;padding:5px 9px;border-radius:999px;background:#2a6b69;color:#dff9e9;font-size:9px;font-weight:900;letter-spacing:.8px}
+.ai-actions{display:flex;justify-content:flex-end;align-items:center;gap:8px;position:relative;z-index:2}.ai-actions .btn{background:#fff;color:var(--navy)}
+.risk-card{border-left:4px solid var(--orange)}.success-card{border-left:4px solid var(--green)}.danger-card{border-left:4px solid var(--danger)}
+.timeline{position:relative;padding-left:20px}.timeline:before{content:"";position:absolute;left:6px;top:4px;bottom:4px;width:2px;background:#d9e3e8}.event{position:relative;padding:0 0 15px 15px;font-size:11px}.event:before{content:"";position:absolute;left:-18px;top:3px;width:8px;height:8px;border-radius:50%;background:var(--green);border:2px solid #fff;box-shadow:0 0 0 1px #bcd3c5}
+.comparison{overflow:auto}.comparison table th:first-child,.comparison table td:first-child{position:sticky;left:0;background:#fff;z-index:1}
+.ai-confidence{display:flex;align-items:center;gap:8px}.confidence-bar{height:7px;flex:1;background:#e9eef0;border-radius:9px;overflow:hidden}.confidence-bar i{display:block;height:100%;background:var(--green);border-radius:9px}
+.evidence-panel{background:#fbfcfd;border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:9px}.evidence-panel mark{background:#fff0a8;padding:1px 3px;border-radius:3px}
+.voice{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--navy);cursor:pointer}.voice.active{background:#fce8e7;color:var(--danger);border-color:#e5a19e}
+.review-card{display:grid;grid-template-columns:1.4fr .6fr auto;gap:12px;align-items:center;padding:13px;border:1px solid var(--line);border-radius:10px;margin-bottom:9px;background:#fff}
+.tabs{display:flex;gap:5px;border-bottom:1px solid var(--line);margin-bottom:14px}.tabs button{border:0;background:transparent;padding:9px 12px;font-size:11px;color:var(--muted);font-weight:700;cursor:pointer}.tabs button.active{color:var(--navy);border-bottom:2px solid var(--green)}
+.pulse{animation:pulse 1.8s infinite}@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(23,130,75,.18)}50%{box-shadow:0 0 0 7px rgba(23,130,75,0)}}
+@media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(3,1fr)}.ai-banner{grid-template-columns:1fr}.ai-actions{justify-content:flex-start}}
+@media(max-width:700px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.review-card{grid-template-columns:1fr}}
+
+/* SIH 10+ AI intelligence layer */
+.ai-deep{border:1px solid #d9e8e1;background:linear-gradient(135deg,#f8fffb,#f4f8ff);border-radius:14px;padding:15px;margin-top:15px}.ai-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.ai-mini{background:#fff;border:1px solid var(--line);border-radius:10px;padding:11px}.sev-high{color:#b42318}.sev-medium{color:#b54708}.sev-low{color:#16724a}.floating-ai{position:fixed;right:22px;bottom:22px;z-index:1000}.ai-fab{width:62px;height:62px;border-radius:50%;border:0;background:var(--navy);color:#fff;font-size:25px;cursor:pointer;box-shadow:0 12px 30px rgba(0,0,0,.2)}.ai-fab-label{position:absolute;right:70px;bottom:11px;background:#fff;border:1px solid var(--line);padding:7px 10px;border-radius:9px;white-space:nowrap;font-size:11px;font-weight:800;box-shadow:0 5px 18px rgba(0,0,0,.08)}.floating-panel{position:absolute;right:0;bottom:76px;width:390px;height:560px;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 55px rgba(0,0,0,.22);display:grid;grid-template-rows:auto 1fr auto;overflow:hidden}.floating-head{background:var(--navy);color:#fff;padding:15px}.floating-head small{color:#b9ced9}.floating-msgs{padding:14px;overflow:auto;background:#f7fafb}.floating-input{display:flex;gap:6px;padding:9px;border-top:1px solid var(--line)}.floating-input input{min-width:0;flex:1}.ai-quick{display:flex;gap:5px;flex-wrap:wrap;padding:0 10px 9px}.ai-quick button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 8px;font-size:9px;cursor:pointer}.ai-source{font-size:9px;color:var(--muted);margin-top:5px}.review-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}@media(max-width:600px){.floating-ai{right:12px;bottom:12px}.floating-panel{position:fixed;right:0;bottom:0;width:100vw;height:100dvh;border-radius:0}.ai-fab-label{display:none}.ai-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="app" class="app">
+<header class="topbar">
+  <div class="brand"><div class="brandmark">G</div><div><h1>GeM Compliance Intelligence</h1><small>SIH26100 · Smart Automation</small></div></div>
+  <nav class="nav">
+    <button :class="{active:view==='dashboard'}" @click="view='dashboard'">{{tr('Dashboard')}}</button>
+    <button :class="{active:view==='list'}" @click="view='list'">{{tr('Tenders')}}</button>
+    <button :class="{active:view==='assistant'}" @click="view='assistant'">{{tr('AI Assistant')}}</button><button :class="{active:view==='compare'}" @click="view='compare'">{{tr('Compare Bids')}}</button><button :class="{active:view==='review'}" @click="view='review'">{{tr('Review Queue')}}</button>
+    <button :class="{active:view==='bid'}" @click="openEvidenceNav">{{tr('Evidence')}}</button>
+  </nav>
+  <div class="actions"><span class="ai-pill">● AI ASSIST</span><select class="lang" v-model="language"><option value="en">English</option><option value="hi">हिन्दी</option><option value="mr">मराठी</option><option value="ta">தமிழ்</option><option value="te">తెలుగు</option></select></div>
+</header>
+
+<div class="shell">
+<aside class="sidebar">
+  <div class="side-label">WORKSPACE</div>
+  <button class="side-btn" :class="{active:view==='dashboard'}" @click="view='dashboard'">▦ &nbsp; {{tr('Dashboard')}}</button>
+  <button class="side-btn" :class="{active:view==='list'}" @click="view='list'">▤ &nbsp; {{tr('Tender Management')}}</button>
+  <button class="side-btn" :class="{active:view==='tender'}" @click="openEvaluationNav">✓ &nbsp; {{tr('Bid Evaluation')}}</button>
+  <button class="side-btn" :class="{active:view==='bid'}" @click="openEvidenceNav">◈ &nbsp; {{tr('Evidence Review')}}</button>
+  <button class="side-btn" :class="{active:view==='assistant'}" @click="view='assistant'">✦ &nbsp; {{tr('AI Assistant')}}</button><button class="side-btn" :class="{active:view==='compare'}" @click="view='compare'">⇄ &nbsp; {{tr('Compare Bids')}}</button><button class="side-btn" :class="{active:view==='review'}" @click="view='review'">⚑ &nbsp; {{tr('Review Queue')}}</button>
+  <div class="side-label">OUTPUT</div>
+  <button class="side-btn" @click="downloadTenderReport" :disabled="!currentTender">⇩ &nbsp; {{tr('Export Report')}}</button>
+  <div class="side-note"><b>Human-in-the-loop</b><br>AI assists with extraction, matching and explanation. Final procurement judgment remains with the authorized evaluator.</div>
+</aside>
+
+<main>
+  <!-- DASHBOARD -->
+  <section v-if="view==='dashboard'">
+    <div class="ai-banner">
+      <div><span class="ai-chip">AI PROCUREMENT COPILOT · ACTIVE</span><h3>GeM Compliance Intelligence Center</h3><p>AI-assisted requirement understanding, evidence matching, explainable scoring and human review — designed as a decision-support layer, not an opaque award engine.</p></div>
+      <div class="ai-actions"><button class="btn pulse" @click="floatingChat=true">✦ Ask Procurement AI</button><button class="btn" @click="view='review'">⚑ Review Queue</button></div>
+    </div>
+    <div class="kpi-grid" style="margin-bottom:16px">
+      <div class="kpi"><div class="icon">T</div><div class="lbl">Active tenders</div><div class="num">{{tenders.length}}</div><div class="small">Configured workspaces</div></div>
+      <div class="kpi"><div class="icon">B</div><div class="lbl">Bids screened</div><div class="num">{{allBids.length}}</div><div class="small">Automated first-pass checks</div></div>
+      <div class="kpi success-card"><div class="icon">%</div><div class="lbl">Avg compliance</div><div class="num">{{avgScore}}%</div><div class="small">Across analyzed bids</div></div>
+      <div class="kpi risk-card"><div class="icon">!</div><div class="lbl">Potential non-compliances</div><div class="num">{{potentialNonCompliances}}</div><div class="small">Failed checks detected</div></div>
+      <div class="kpi danger-card"><div class="icon">×</div><div class="lbl">Non-compliant</div><div class="num">{{counts.failed}}</div><div class="small">Mandatory issue detected</div></div>
+    </div>
+
+    <div class="pagehead"><div><div class="eyebrow">PROCUREMENT INTELLIGENCE</div><h2>{{tr('Compliance Command Center')}}</h2><p>One view for tender rules, bidder evidence, compliance scores and explainable decisions.</p></div><button class="btn green" @click="view='list'">+ {{tr('Open Tender Workspace')}}</button></div>
+    <div class="grid4">
+      <div class="card stat"><div class="label">Tenders</div><div class="num">{{tenders.length}}</div><div class="sub">Configured procurement cases</div></div>
+      <div class="card stat"><div class="label">Bids screened</div><div class="num">{{allBids.length}}</div><div class="sub">Across current workspace</div></div>
+      <div class="card stat"><div class="label">Compliant</div><div class="num">{{counts.compliant}}</div><div class="sub">Ready for evaluator review</div></div>
+      <div class="card stat"><div class="label">Needs review</div><div class="num">{{counts.review}}</div><div class="sub">Human attention recommended</div></div>
+    </div>
+
+    <div class="grid3" style="margin-top:16px">
+      <div class="card success-card"><div class="cardhead"><h3>AI Insight</h3><span class="ai-pill">LIVE</span></div><b style="font-size:13px">Evidence-first decisions</b><p class="small" style="line-height:1.6;margin-bottom:0">Every result is linked to a requirement, evidence source and confidence signal.</p></div>
+      <div class="card"><div class="cardhead"><h3>Risk Focus</h3><span class="small">Today</span></div><b style="font-size:13px">{{counts.review}} bid(s) need human review</b><p class="small" style="line-height:1.6;margin-bottom:0">Prioritize ambiguous evidence instead of blindly trusting automation.</p></div>
+      <div class="card"><div class="cardhead"><h3>Multilingual</h3><span class="small">{{languageLabel}}</span></div><b style="font-size:13px">Evaluator + bidder friendly</b><p class="small" style="line-height:1.6;margin-bottom:0">Interface and assistant adapt to the selected language.</p></div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="cardhead"><h3>End-to-End Compliance Workflow</h3><span class="small">Designed for explainability</span></div>
+      <div class="flow">
+        <div class="flowbox"><b>01</b><span>Tender Clauses</span></div><div class="flowbox"><b>02</b><span>Bid Documents</span></div><div class="flowbox"><b>03</b><span>Text Extraction</span></div><div class="flowbox"><b>04</b><span>Rule Matching</span></div><div class="flowbox"><b>05</b><span>Weighted Score</span></div><div class="flowbox"><b>06</b><span>Explainable Report</span></div>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:16px">
+      <div class="card"><div class="cardhead"><h3>Compliance Distribution</h3><span class="small">Current bids</span></div>
+        <div v-if="allBids.length" style="display:grid;grid-template-columns:180px 1fr;align-items:center">
+          <div><div class="donut" :style="{background:donutStyle}"><div class="inner"><div><strong>{{allBids.length}}</strong><div class="small">bids</div></div></div></div><div class="legend"><span><i class="dot" style="background:#17824b"></i>Compliant</span><span><i class="dot" style="background:#e76f2f"></i>Review</span><span><i class="dot" style="background:#c94b45"></i>Failed</span></div></div>
+          <div><div class="barrow"><span>Compliant</span><div class="bar"><i class="greenbar" :style="{width:pct(counts.compliant)+'%'}"></i></div><b>{{counts.compliant}}</b></div><div class="barrow"><span>Needs review</span><div class="bar"><i class="orangebar" :style="{width:pct(counts.review)+'%'}"></i></div><b>{{counts.review}}</b></div><div class="barrow"><span>Non-compliant</span><div class="bar"><i class="redbar" :style="{width:pct(counts.failed)+'%'}"></i></div><b>{{counts.failed}}</b></div></div>
+        </div><div v-else class="empty">Submit a bid to populate compliance analytics.</div>
+      </div>
+      <div class="card"><div class="cardhead"><h3>Latest Bids</h3><span class="small">Score at a glance</span></div>
+        <div v-if="allBids.length"><table><thead><tr><th>Vendor</th><th>Score</th><th>Status</th></tr></thead><tbody><tr v-for="b in allBids.slice(0,5)" class="click" @click="openBid(b.id)"><td><b>{{b.vendor_name}}</b><br><span class="small">{{b.documents?.length||0}} documents</span></td><td><b>{{b.compliance_score??'—'}}%</b></td><td><span class="badge" :class="b.status">{{labelStatus(b.status)}}</span></td></tr></tbody></table></div>
+        <div v-else class="empty">No bids submitted yet.</div>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:16px">
+      <div class="card"><div class="cardhead"><h3>Compliance Trend</h3><span class="small">Analyzed bid scores</span></div>
+        <div v-if="allBids.length" class="trend"><div v-for="(b,i) in allBids.slice(0,8).reverse()" :key="b.id" class="trend-col"><b style="font-size:10px;color:var(--navy)">{{b.compliance_score??0}}%</b><div class="trend-bar" :style="{height:Math.max(8,Number(b.compliance_score)||0)+'%'}"></div><span>Bid {{i+1}}</span></div></div><div v-else class="empty">Scores will appear here as bids are analyzed.</div>
+      </div>
+      <div class="card"><div class="cardhead"><h3>Requirement Risk Map</h3><span class="small">Across visible bids</span></div>
+        <div v-if="allBids.length" class="metric-chart"><div class="metric-row"><span>Passed checks</span><div class="bar"><i class="greenbar" :style="{width:Math.min(100,Math.round((allBids.reduce((n,b)=>n+(b.results||[]).filter(r=>r.passed).length,0)/Math.max(1,allBids.reduce((n,b)=>n+(b.results||[]).length,0)))*100))+'%'}"></i></div><b>{{allBids.reduce((n,b)=>n+(b.results||[]).filter(r=>r.passed).length,0)}}</b></div><div class="metric-row"><span>Failed checks</span><div class="bar"><i class="redbar" :style="{width:Math.min(100,Math.round((potentialNonCompliances/Math.max(1,allBids.reduce((n,b)=>n+(b.results||[]).length,0)))*100))+'%'}"></i></div><b>{{potentialNonCompliances}}</b></div><div class="metric-row"><span>Human review</span><div class="bar"><i class="orangebar" :style="{width:pct(counts.review)+'%'}"></i></div><b>{{counts.review}}</b></div></div><div v-else class="empty">Analyze bids to populate the risk map.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TENDERS -->
+  <section v-if="view==='list'">
+    <div class="pagehead"><div><div class="eyebrow">TENDER MANAGEMENT</div><h2>{{tr('Create & Configure Tender')}}</h2><p>Define machine-checkable requirements before bids arrive.</p></div><button class="btn light" @click="view='dashboard'">← {{tr('Dashboard')}}</button></div>
+    <div class="grid2">
+      <div class="card">
+        <div class="cardhead"><h3>New GeM Tender</h3><span class="small">Rule configuration</span></div>
+        <label>Title</label><input v-model="newTender.title" placeholder="Supply of Industrial Valves">
+        <div class="grid2" style="grid-template-columns:1fr 1fr"><div><label>GeM Bid Number</label><input v-model="newTender.gem_bid_number" placeholder="GEM/2026/B/000999"></div><div><label>Department</label><input v-model="newTender.department" placeholder="Ministry / Department"></div></div>
+        <label>Description</label><textarea v-model="newTender.description" rows="2"></textarea><div class="ai-deep"><div class="cardhead"><h3>🧠 AI Requirement Extractor</h3><span class="ai-pill">REAL GROQ</span></div><p class="small">Paste tender clause text into the description, then let AI discover and structure compliance requirements.</p><button class="btn" @click="aiExtractRequirements" :disabled="aiBusy">{{aiBusy?"Extracting…":"Extract Requirements with AI"}}</button></div>
+        <label>Compliance Requirements</label>
+        <div v-for="(r,i) in newTender.requirements" :key="i" class="req">
+          <input v-model="r.name" placeholder="Requirement">
+          <select v-model="r.rule_type"><option value="DOCUMENT_PRESENT">Document present</option><option value="KEYWORD_MATCH">Keyword match</option><option value="MIN_VALUE">Minimum value</option><option value="MAX_VALUE">Maximum value</option></select>
+          <input v-if="r.rule_type==='DOCUMENT_PRESENT'||r.rule_type==='KEYWORD_MATCH'" v-model="r.match_value" placeholder="keyword">
+          <template v-else><input v-model="r.field_name" placeholder="field"><input v-model.number="r.numeric_bound" type="number" placeholder="bound"></template>
+          <input v-model.number="r.weight" type="number" placeholder="weight">
+          <button class="btn light" @click="newTender.requirements.splice(i,1)">×</button>
+        </div>
+        <button class="btn light" @click="addRequirementRow">+ Add requirement</button>
+        <button class="btn green" style="margin-left:7px" @click="createTender">Create Tender</button>
+      </div>
+      <div class="card">
+        <div class="cardhead"><h3>Configured Tenders</h3><span class="small">{{tenders.length}} total</span></div>
+        <div v-if="tenders.length"><div v-for="t in tenders" :key="t.id" class="click" @click="openTender(t.id)" style="padding:13px 4px;border-bottom:1px solid #edf1f3"><b>{{t.title}}</b><div class="small">{{t.gem_bid_number}} · {{t.requirements.length}} requirements · {{t.bid_count}} bids</div></div></div><div v-else class="empty">No tenders yet.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TENDER DETAIL -->
+  <section v-if="view==='tender'">
+    <div class="pagehead"><div><div class="eyebrow">BID EVALUATION</div><h2>{{currentTender?.title}}</h2><p>{{currentTender?.gem_bid_number}} · {{currentTender?.department}}</p></div><button class="btn light" @click="view='list'">← Tenders</button></div>
+    <div class="card" v-if="currentTender"><div class="cardhead"><h3>Requirements & Rule Map</h3><span class="small">{{currentTender.requirements.length}} checks</span></div>
+      <div v-for="r in currentTender.requirements" :key="r.id" class="result"><div><b>{{r.name}}</b><br><span class="small">{{r.rule_type}} · weight {{r.weight}}</span></div><div><span class="badge" :class="r.is_mandatory?'NEEDS_REVIEW':'COMPLIANT'">{{r.is_mandatory?'MANDATORY':'OPTIONAL'}}</span></div><div class="small">{{r.match_value || (r.field_name+' '+(r.numeric_bound??''))}}</div></div>
+    </div>
+    <div class="grid2" style="margin-top:16px">
+      <div class="card"><div class="cardhead"><h3>Submit Bid</h3><span class="small">Vendor workspace</span></div>
+        <label>Vendor Name</label><input v-model="newBid.vendor_name" placeholder="Company / bidder name">
+        <label>Vendor Email</label><input v-model="newBid.vendor_email" placeholder="procurement@example.com">
+        <div v-for="r in numericFields" :key="r.field_name"><label>{{r.name}}</label><input v-model.number="newBid.declared[r.field_name]" type="number" :placeholder="'Enter '+r.field_name"></div>
+        <label>Bid Documents</label><input type="file" multiple accept=".pdf,.docx,.txt,.csv" @change="onFileChange">
+        <div class="notice" style="margin-top:12px">The prototype extracts text from submitted documents and checks each configured requirement. Results are retained as evidence for review.</div>
+        <button class="btn green" @click="submitBid" :disabled="submitting" style="margin-top:12px">{{submitting?'Running checks…':'Submit Bid & Run Compliance Check'}}</button>
+      </div>
+      <div class="card"><div class="cardhead"><h3>Bid Screening</h3><button class="btn light" @click="downloadTenderReport">Export</button></div>
+        <div v-if="bids.length"><table><thead><tr><th>Vendor</th><th>Score</th><th>Status</th></tr></thead><tbody><tr v-for="b in bids" :key="b.id" class="click" @click="openBid(b.id)"><td><b>{{b.vendor_name}}</b><br><span class="small">{{b.documents?.length||0}} docs</span></td><td><b>{{b.compliance_score??'—'}}%</b></td><td><span class="badge" :class="b.status">{{labelStatus(b.status)}}</span></td></tr></tbody></table></div><div v-else class="empty">No bids submitted for this tender.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BID DETAIL -->
+  <section v-if="view==='bid'">
+    <div v-if="!currentBid" class="card empty" style="margin-top:16px;text-align:center;padding:48px 20px">
+      <div style="font-size:34px;margin-bottom:10px">◈</div>
+      <h2 style="font-family:Georgia,serif;color:var(--navy);margin:0 0 8px">Evidence Review</h2>
+      <p class="small" style="max-width:520px;margin:0 auto 18px;line-height:1.7">Select a submitted bid to inspect requirement-level evidence, AI reasoning, risk findings and the human verification gate.</p>
+      <button class="btn green" @click="openEvaluationNav">Open Bid Evaluation</button>
+    </div>
+    <template v-else>
+    <div class="pagehead"><div><div class="eyebrow">EVIDENCE REVIEW</div><h2>{{currentBid?.vendor_name}}</h2><p>Rule-level explanation of the automated compliance assessment.</p></div><button class="btn light" @click="view='tender'">← Bid dashboard</button></div>
+    <div class="grid2">
+      <div class="card">
+        <div class="scorebox"><div class="scorecircle">{{currentBid?.compliance_score}}%</div><div><div class="small">FINAL COMPLIANCE SCORE</div><h3 style="margin:4px 0 7px">{{labelStatus(currentBid?.status)}}</h3><p class="small">Mandatory failures override the weighted score.</p></div></div>
+        <div class="card" style="margin-top:15px;background:#fbfcfd"><div class="cardhead"><h3>AI Evidence Confidence</h3><span class="small">Assistive signal</span></div><div v-for="r in currentBid?.results||[]" :key="'c'+r.requirement_id" class="ai-confidence" style="margin:8px 0"><span style="width:155px;font-size:10px">{{r.requirement_name}}</span><div class="confidence-bar"><i :style="{width:(r.passed?92:64)+'%'}"></i></div><b style="font-size:10px">{{r.passed?'92':'64'}}%</b></div></div>
+        <div style="margin-top:18px"><div class="cardhead"><h3>Requirement-by-Requirement Evidence</h3><span class="small">{{currentBid?.results?.length||0}} checks</span></div>
+          <div v-for="r in currentBid?.results||[]" :key="r.requirement_id" class="result"><div><b>{{r.requirement_name}}</b><br><span class="small">{{r.is_mandatory?'Mandatory':'Optional'}}</span></div><div :class="r.passed?'pass':'fail'">{{r.passed?'PASS':'FAIL'}}</div><div class="small">{{r.detail}}</div></div>
+        </div>
+        <div class="evidence-panel"><b style="font-size:11px">Evidence trace</b><div class="small" style="margin-top:6px">Each check can be traced to an uploaded document, extracted value or declared field. Highlighted evidence should be verified when confidence is low.</div></div>
+        <button class="btn light" @click="reevaluate" style="margin-top:14px">↻ Re-run compliance check</button>
+        <button class="btn green" @click="downloadBidReport" style="margin-top:14px;margin-left:6px">⇩ Download PDF Certificate</button><div class="review-actions"><button class="btn green" @click="reviewAction('APPROVE')">✓ Approve</button><button class="btn light" @click="reviewAction('SEND_FOR_REVIEW')">⚑ Send for Review</button><button class="btn light" @click="reviewAction('REQUEST_CLARIFICATION')">? Request Clarification</button><button class="btn" @click="reviewAction('REJECT')">✕ Reject</button></div><div class="ai-source">Human verification gate: AI recommendations are advisory.</div>
+      </div>
+      <div class="card"><div class="cardhead"><h3>AI Explanation</h3><span class="ai-pill">AI ASSIST</span></div>
+        <div class="notice">{{aiExplanation}}</div><div class="ai-deep" v-if="aiAnalysis"><div class="cardhead"><h3>🧠 Deep AI Intelligence</h3><span class="ai-pill">{{aiAnalysis.payload?.confidence||'—'}}% CONFIDENCE</span></div><p class="small">{{aiAnalysis.payload?.executive_summary}}</p><div class="ai-grid"><div class="ai-mini"><b>Eligibility</b><div class="small"><strong>{{aiAnalysis.payload?.eligibility_assessment?.status||'REQUIRES HUMAN REVIEW'}}</strong><br>{{(aiAnalysis.payload?.eligibility_assessment?.reasons||[]).slice(0,2).join(' ')}}</div></div><div class="ai-mini"><b>AI Recommendation</b><div class="small">{{aiAnalysis.payload?.recommendation||'Review the bid evidence and complete human verification before final action.'}}</div></div></div><div v-if="aiAnalysis.payload?.risks?.length" style="margin-top:10px"><b style="font-size:11px">Risk intelligence</b><div v-for="r in aiAnalysis.payload.risks.slice(0,4)" class="small" style="margin-top:6px"><span :class="'sev-'+String(r.severity||'medium').toLowerCase()">● {{r.severity}}</span> · {{r.issue}}</div></div><div v-if="aiAnalysis.payload?.inconsistencies?.length" style="margin-top:10px"><b style="font-size:11px">Inconsistencies detected</b><div v-for="r in aiAnalysis.payload.inconsistencies.slice(0,3)" class="small" style="margin-top:5px">⚠ {{r.issue}}</div></div></div><button class="btn" style="margin-top:10px" @click="runDeepAI" :disabled="aiBusy">{{aiBusy?'AI analyzing…':'🧠 Run Deep AI Analysis'}}</button>
+        <div style="margin-top:17px"><h3 style="margin-bottom:8px">What the evaluator can see</h3><div class="small" style="line-height:1.8">• Which requirement passed or failed<br>• What document/field supported the result<br>• Why the final status was assigned<br>• Where human review is recommended</div></div>
+        <button class="btn" style="margin-top:18px" @click="view='assistant'">Ask AI Assistant →</button>
+      </div>
+    </div>
+    </template>
+  </section>
+
+  <!-- COMPARE BIDS -->
+  <section v-if="view==='compare'">
+    <div class="pagehead"><div><div class="eyebrow">DECISION SUPPORT</div><h2>Bid Comparison</h2><p>Compare vendors requirement-by-requirement before human evaluation.</p></div><button class="btn light" @click="view='dashboard'">← Dashboard</button></div>
+    <div class="card" v-if="allBids.length">
+      <div class="cardhead"><h3>Compliance Matrix</h3><span class="small">{{allBids.length}} bid(s)</span></div>
+      <div class="comparison">
+        <table><thead><tr><th>Requirement</th><th v-for="b in allBids.slice(0,5)" :key="b.id">{{b.vendor_name}}<br><span class="small">{{b.compliance_score??'—'}}%</span></th></tr></thead>
+        <tbody>
+          <tr v-for="r in comparisonRequirements" :key="r.id"><td><b>{{r.name}}</b><br><span class="small">{{r.is_mandatory?'Mandatory':'Optional'}}</span></td><td v-for="b in allBids.slice(0,5)" :key="b.id"><span :class="resultFor(b,r.id)?.passed?'pass':'fail'">{{resultFor(b,r.id)?.passed?'✓ PASS':'✕ FAIL'}}</span></td></tr>
+          <tr><td><b>Final status</b></td><td v-for="b in allBids.slice(0,5)" :key="b.id"><span class="badge" :class="b.status">{{labelStatus(b.status)}}</span></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+    <div class="grid3" style="margin-top:16px">
+      <div v-for="b in allBids.slice(0,3)" :key="b.id" class="card"><div class="cardhead"><h3>{{b.vendor_name}}</h3><span class="badge" :class="b.status">{{labelStatus(b.status)}}</span></div><div class="scorebox"><div class="scorecircle">{{b.compliance_score??'—'}}%</div><div><div class="small">COMPLIANCE SCORE</div><p class="small">Evidence: {{b.documents?.length||0}} document(s)</p></div></div><button class="btn light" style="margin-top:12px" @click="openBid(b.id)">Inspect evidence</button></div>
+    </div>
+    <div v-if="allBids.length" class="card" style="margin-top:16px"><div class="cardhead"><h3>AI Comparison Summary</h3><span class="ai-pill">AI ASSIST</span></div><div class="notice">{{comparisonSummary}}</div></div>
+    <div v-else class="card empty">Submit bids to enable vendor comparison.</div>
+  </section>
+
+  <!-- REVIEW QUEUE -->
+  <section v-if="view==='review'">
+    <div class="pagehead"><div><div class="eyebrow">HUMAN-IN-THE-LOOP</div><h2>Review Queue</h2><p>Cases where automated checks should be verified by an authorized evaluator.</p></div><button class="btn light" @click="view='dashboard'">← Dashboard</button></div>
+    <div class="card"><div class="cardhead"><h3>Priority Cases</h3><span class="small">{{reviewBids.length}} case(s)</span></div>
+      <div v-if="reviewBids.length">
+        <div v-for="b in reviewBids" :key="b.id" class="review-card">
+          <div><b>{{b.vendor_name}}</b><div class="small">{{b.compliance_score}}% · {{b.results?.filter(r=>!r.passed).length||0}} failed check(s)</div></div>
+          <div><span class="badge NEEDS_REVIEW">NEEDS REVIEW</span></div>
+          <div><button class="btn light" @click="openBid(b.id)">Review Evidence</button></div>
+        </div>
+      </div>
+      <div v-else class="empty">No bids are currently waiting for human review.</div>
+    </div>
+    <div class="grid2" style="margin-top:16px">
+      <div class="card"><div class="cardhead"><h3>Review Principles</h3></div><div class="small" style="line-height:2">✓ AI recommendation is advisory<br>✓ Evidence is shown before action<br>✓ Mandatory failures remain explicit<br>✓ Evaluator can re-run checks after clarification<br>✓ Final procurement judgment remains human-controlled</div></div>
+      <div class="card"><div class="cardhead"><h3>Audit Trail</h3></div><div class="timeline"><div class="event"><b>Bid received</b><br><span class="small">Document package registered</span></div><div class="event"><b>Evidence extracted</b><br><span class="small">Text and metadata normalized</span></div><div class="event"><b>Rules evaluated</b><br><span class="small">Mandatory gate + weighted score</span></div><div class="event"><b>Human review</b><br><span class="small">Only where ambiguity requires judgment</span></div></div></div>
+    </div>
+  </section>
+
+  <!-- ASSISTANT -->
+  <section v-if="view==='assistant'">
+    <div class="pagehead"><div><div class="eyebrow">PROCUREMENT COPILOT</div><h2>AI Assistant</h2><p>Ask about requirements, evidence, scores or the current evaluation.</p></div></div>
+    <div class="grid2">
+      <div class="chat">
+        <div class="chathead"><div><b>GeM Compliance Copilot</b><br><small>Requirement • Evidence • Risk • Score</small></div><span>{{chatLoading?"● Thinking…":"● AI Online"}}</span></div>
+        <div class="messages">
+          <div v-for="m in messages" :class="['msg',m.role]">{{m.text}}</div>
+        </div>
+        <div style="padding:0 12px"><div class="quick"><button @click="ask('Why is this bid compliant?')">Why is this bid compliant?</button><button @click="ask('Show failed requirements')">Show failed requirements</button><button @click="ask('Explain the score')">Explain the score</button><button @click="ask('How does multilingual mode work?')">Multilingual mode</button></div></div>
+        <div class="chatinput"><button class="voice" :class="{active:listening}" @click="toggleVoice" title="Voice input">🎙</button><input v-model="chatInput" @keyup.enter="ask(chatInput)" placeholder="Ask: Why did this bid fail?"><button class="btn green" :disabled="chatLoading" @click="ask(chatInput)">{{chatLoading?"Thinking…":"Send"}}</button></div>
+      </div>
+      <div>
+        <div class="card"><div class="cardhead"><h3>Assistant Capabilities</h3><span class="ai-pill">AI</span></div>
+          <div class="result"><b>Requirement reasoning</b><span></span><span class="small">Explains pass/fail evidence</span></div>
+          <div class="result"><b>Score interpretation</b><span></span><span class="small">Breaks down weighted compliance</span></div>
+          <div class="result"><b>Document guidance</b><span></span><span class="small">Highlights missing evidence</span></div>
+          <div class="result"><b>Multilingual support</b><span></span><span class="small">UI labels and assistant responses adapt to selected language</span></div>
+        </div>
+        <div class="card" style="margin-top:16px"><div class="cardhead"><h3>Language Mode</h3></div><p class="small">Select a language from the top-right menu. The navigation, key labels and assistant responses change with the selection.</p><div class="notice">Prototype language pack: English, Hindi, Marathi, Tamil and Telugu.</div></div>
+      </div>
+    </div>
+  </section>
+</main>
+</div>
+
+<!-- FLOATING AI PROCUREMENT COPILOT -->
+<div class="floating-ai">
+  <div v-if="floatingChat" class="floating-panel">
+    <div class="floating-head"><div style="display:flex;justify-content:space-between;align-items:center"><div><b>✦ GeM Procurement Copilot</b><br><small>Evidence • Risk • Compliance • Eligibility</small></div><button class="btn" style="padding:5px 8px;background:#fff" @click="floatingChat=false">×</button></div></div>
+    <div class="floating-msgs"><div v-for="m in messages" :class="['msg',m.role]">{{m.text}}<div v-if="m.realAi" class="ai-source">Generated by Groq AI · evidence-grounded</div></div></div>
+    <div><div class="ai-quick"><button @click="ask('Why did this bid fail?')">Why did it fail?</button><button @click="ask('Show mandatory violations')">Mandatory violations</button><button @click="ask('Summarize vendor risk')">Risk summary</button><button @click="ask('What documents are missing?')">Missing documents</button><button @click="ask('Compare this vendor with the other bids')">Compare vendors</button></div><div class="floating-input"><button class="voice" :class="{active:listening}" @click="toggleVoice">🎙</button><input v-model="chatInput" @keyup.enter="ask(chatInput)" placeholder="Ask AI about this bid…"><button class="btn green" :disabled="chatLoading" @click="ask(chatInput)">{{chatLoading?'…':'➤'}}</button></div></div>
+  </div>
+  <span v-if="!floatingChat" class="ai-fab-label">Ask GeM AI</span><button class="ai-fab pulse" @click="floatingChat=!floatingChat">{{floatingChat?'×':'✦'}}</button>
+</div>
+
+<!-- AI ANALYSIS EXPERIENCE -->
+<div v-if="analysis" class="analysis-overlay">
+  <div class="analysis-modal">
+    <div class="analysis-title"><div class="ai-orb">✦</div><div><div class="eyebrow">AI PROCUREMENT COPILOT</div><h2 style="margin:3px 0 2px;color:var(--navy);font-family:Georgia,serif">AI Analysis in Progress</h2><div class="small">Turning bidder documents into an explainable compliance decision</div></div></div>
+    <div v-for="(step,i) in ['Reading document package','Extracting clauses & evidence','Matching mandatory requirements','Checking values & conditions','Calculating weighted compliance','Generating explanation & risk summary']" :key="step" :class="['analysis-step',i<analysisStep?'done':'',i===analysisStep?'active':'']">
+      <div class="stepdot">{{i<analysisStep?'✓':String(i+1).padStart(2,'0')}}</div><div><b>{{step}}</b><div class="small">{{i<analysisStep?'Completed':i===analysisStep?'Working on this step…':'Queued'}}</div></div><div class="state">{{i<analysisStep?'✓':i===analysisStep?'…':'·'}}</div>
+    </div>
+    <div class="analysis-foot"><b>Explainable AI</b> · Every recommendation is paired with the requirement, supporting evidence and a confidence signal. Final procurement judgment remains with the authorized evaluator.</div>
+  </div>
+</div>
+</div>
+
+<script>
+const {createApp}=Vue; const API="/api";
+const translations={
+en:{Dashboard:"Dashboard",Tenders:"Tenders","AI Assistant":"AI Assistant",Evidence:"Evidence","Compare Bids":"Compare Bids","Review Queue":"Review Queue","Tender Management":"Tender Management","Bid Evaluation":"Bid Evaluation","Evidence Review":"Evidence Review","Export Report":"Export Report","Compliance Command Center":"Compliance Command Center","Open Tender Workspace":"Open Tender Workspace","Create & Configure Tender":"Create & Configure Tender"},
+hi:{Dashboard:"डैशबोर्ड",Tenders:"टेंडर","AI Assistant":"एआई सहायक",Evidence:"साक्ष्य","Compare Bids":"बोली तुलना","Review Queue":"समीक्षा कतार","Tender Management":"टेंडर प्रबंधन","Bid Evaluation":"बोली मूल्यांकन","Evidence Review":"साक्ष्य समीक्षा","Export Report":"रिपोर्ट निर्यात","Compliance Command Center":"अनुपालन नियंत्रण केंद्र","Open Tender Workspace":"टेंडर कार्यक्षेत्र खोलें","Create & Configure Tender":"टेंडर बनाएं और कॉन्फ़िगर करें"},
+mr:{Dashboard:"डॅशबोर्ड",Tenders:"टेंडर","AI Assistant":"एआय सहाय्यक",Evidence:"पुरावा","Compare Bids":"बोली तुलना","Review Queue":"पुनरावलोकन रांग","Tender Management":"टेंडर व्यवस्थापन","Bid Evaluation":"बोली मूल्यांकन","Evidence Review":"पुरावा पुनरावलोकन","Export Report":"अहवाल निर्यात","Compliance Command Center":"अनुपालन नियंत्रण केंद्र","Open Tender Workspace":"टेंडर कार्यक्षेत्र उघडा","Create & Configure Tender":"टेंडर तयार करा व कॉन्फिगर करा"},
+ta:{Dashboard:"டாஷ்போர்டு",Tenders:"டெண்டர்கள்","AI Assistant":"AI உதவியாளர்",Evidence:"ஆதாரம்","Compare Bids":"ஏல ஒப்பீடு","Review Queue":"ஆய்வு வரிசை","Tender Management":"டெண்டர் மேலாண்மை","Bid Evaluation":"ஏலம் மதிப்பீடு","Evidence Review":"ஆதார ஆய்வு","Export Report":"அறிக்கையை ஏற்றுமதி செய்","Compliance Command Center":"இணக்க கட்டுப்பாட்டு மையம்","Open Tender Workspace":"டெண்டர் பணியிடத்தை திற","Create & Configure Tender":"டெண்டரை உருவாக்கி அமைக்கவும்"},
+te:{Dashboard:"డ్యాష్‌బోర్డ్",Tenders:"టెండర్లు","AI Assistant":"AI సహాయకుడు",Evidence:"ఆధారం","Compare Bids":"బిడ్ పోలిక","Review Queue":"సమీక్ష క్యూ","Tender Management":"టెండర్ నిర్వహణ","Bid Evaluation":"బిడ్ మూల్యాంకనం","Evidence Review":"ఆధార సమీక్ష","Export Report":"నివేదిక ఎగుమతి","Compliance Command Center":"కంప్లయన్స్ కంట్రోల్ సెంటర్","Open Tender Workspace":"టెండర్ వర్క్‌స్పేస్ తెరవండి","Create & Configure Tender":"టెండర్‌ను సృష్టించి కాన్ఫిగర్ చేయండి"}
+};
+createApp({
+data(){return{view:"dashboard",language:"en",tenders:[],currentTender:null,currentTenderId:null,bids:[],currentBid:null,newTender:{title:"",gem_bid_number:"",department:"",description:"",requirements:[]},newBid:{vendor_name:"",vendor_email:"",declared:{},files:[]},submitting:false,analysis:false,analysisStep:0,listening:false,chatLoading:false,chatInput:"",floatingChat:false,aiBusy:false,aiAnalysis:null,messages:[{role:"bot",text:"Hello. I can explain tender requirements, compliance scores, failed checks and evidence. Select a language above or ask me a question."}]}},
+computed:{
+numericFields(){return this.currentTender?this.currentTender.requirements.filter(r=>r.rule_type==="MIN_VALUE"||r.rule_type==="MAX_VALUE"):[]},
+allBids(){return this.tenders.flatMap(t=>t.bids||[]).concat(this.currentTenderId?this.bids:[]).filter((b,i,a)=>a.findIndex(x=>x.id===b.id)===i)},
+counts(){return{compliant:this.allBids.filter(b=>b.status==="COMPLIANT").length,review:this.allBids.filter(b=>b.status==="NEEDS_REVIEW").length,failed:this.allBids.filter(b=>b.status==="NON_COMPLIANT").length}},avgScore(){return this.allBids.length?Math.round(this.allBids.reduce((a,b)=>a+(Number(b.compliance_score)||0),0)/this.allBids.length):0},potentialNonCompliances(){return this.allBids.reduce((n,b)=>n+(b.results||[]).filter(r=>!r.passed).length,0)},
+donutStyle(){let n=this.allBids.length||1,c=this.counts.compliant/n*100,r=(this.counts.compliant+this.counts.review)/n*100;return `conic-gradient(#17824b 0 ${c}%, #e76f2f ${c}% ${r}%, #c94b45 ${r}% 100%)`},
+languageLabel(){return {en:"English",hi:"हिन्दी",mr:"मराठी",ta:"தமிழ்",te:"తెలుగు"}[this.language]||"English"},
+reviewBids(){return this.allBids.filter(b=>b.status==="NEEDS_REVIEW")},
+comparisonRequirements(){return this.currentTender?.requirements||this.tenders[0]?.requirements||[]},
+comparisonSummary(){if(!this.allBids.length)return"No bids available for comparison.";let s=[...this.allBids].sort((a,b)=>(b.compliance_score||0)-(a.compliance_score||0));return `${s[0].vendor_name} currently has the highest compliance score at ${s[0].compliance_score}%. The matrix above highlights requirement-level differences; any mandatory failure should be reviewed before a final procurement decision.`},
+aiExplanation(){if(!this.currentBid)return"Open a bid to receive an evidence-based explanation.";let fails=(this.currentBid.results||[]).filter(r=>!r.passed),pass=(this.currentBid.results||[]).filter(r=>r.passed);if(this.currentBid.status==="COMPLIANT")return`The bid passed all mandatory checks and achieved ${this.currentBid.compliance_score}% overall. ${pass.length} requirement(s) passed.`;if(this.currentBid.status==="NON_COMPLIANT")return`The bid is non-compliant because ${fails.length} requirement(s) failed, including at least one mandatory requirement. Review the evidence before taking action.`;return`The bid scored ${this.currentBid.compliance_score}%, but it is below the compliant threshold or has an unresolved check. Human review is recommended.`}
+},
+mounted(){this.loadTenders()},
+methods:{
+tr(k){return translations[this.language]?.[k]||k},pct(n){return this.allBids.length?Math.round(n/this.allBids.length*100):0},labelStatus(s){return s==="COMPLIANT"?"COMPLIANT":s==="NON_COMPLIANT"?"NON-COMPLIANT":"NEEDS REVIEW"},
+addRequirementRow(){this.newTender.requirements.push({name:"",rule_type:"DOCUMENT_PRESENT",match_value:"",field_name:"",numeric_bound:null,weight:1,is_mandatory:true})},
+async apiFetch(url,opt={}){let r=await fetch(API+url,opt),d=null;try{d=await r.json()}catch(e){}if(!r.ok)throw Error(d?.error||`Request failed (${r.status})`);return d},
+async loadTenders(){try{this.tenders=await this.apiFetch("/tenders");for(const t of this.tenders){try{t.bids=await this.apiFetch(`/tenders/${t.id}/bids`)}catch(e){t.bids=[]}}}catch(e){console.error(e)}},
+async createTender(){try{await this.apiFetch("/tenders",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(this.newTender)});this.newTender={title:"",gem_bid_number:"",department:"",description:"",requirements:[]};await this.loadTenders();this.view="dashboard"}catch(e){alert(e.message)}},
+async openTender(id){this.currentTenderId=id;try{this.currentTender=await this.apiFetch(`/tenders/${id}`);this.bids=await this.apiFetch(`/tenders/${id}/bids`);this.newBid={vendor_name:"",vendor_email:"",declared:{},files:[]};this.view="tender"}catch(e){alert(e.message)}},async openEvaluationNav(){
+  if(this.currentTender){this.view="tender";return}
+  if(this.tenders.length){await this.openTender(this.tenders[0].id);return}
+  this.view="list";
+},
+async openEvidenceNav(){
+  if(this.currentBid){this.view="bid";return}
+  if(this.bids.length){await this.openBid(this.bids[0].id);return}
+  const t=this.currentTender || this.tenders[0];
+  if(t){
+    await this.openTender(t.id);
+    if(this.bids.length){await this.openBid(this.bids[0].id);return}
+    this.view="bid";
+    return
+  }
+  this.view="list";
+},
+
+onFileChange(e){this.newBid.files=[...e.target.files]},
+async submitBid(){if(!this.newBid.vendor_name)return alert("Enter vendor name");this.submitting=true;this.analysis=true;this.analysisStep=0;let f=new FormData();f.append("vendor_name",this.newBid.vendor_name);f.append("vendor_email",this.newBid.vendor_email);Object.entries(this.newBid.declared).forEach(([k,v])=>f.append("declared_"+k,v));this.newBid.files.forEach(x=>f.append("documents",x));let timer=setInterval(()=>{if(this.analysisStep<5)this.analysisStep++},650);try{let b=await this.apiFetch(`/tenders/${this.currentTenderId}/bids`,{method:"POST",body:f});this.analysisStep=6;await new Promise(r=>setTimeout(r,650));this.currentBid=b;await this.loadBids();await this.loadTenders();this.view="bid"}catch(e){alert(e.message)}finally{clearInterval(timer);this.analysis=false;this.submitting=false}},
+async loadBids(){this.bids=await this.apiFetch(`/tenders/${this.currentTenderId}/bids`)},
+async openBid(id){try{this.currentBid=await this.apiFetch(`/bids/${id}`);this.currentTenderId=this.currentBid.tender_id;this.aiAnalysis=null;try{this.aiAnalysis=await this.apiFetch(`/bids/${id}/ai-analysis`)}catch(e){}this.view="bid"}catch(e){alert(e.message)}},
+async reevaluate(){try{this.currentBid=await this.apiFetch(`/bids/${this.currentBid.id}/reevaluate`,{method:"POST"});await this.loadBids();await this.loadTenders()}catch(e){alert(e.message)}},
+downloadTenderReport(){if(this.currentTenderId)window.open(`${API}/tenders/${this.currentTenderId}/report`,"_blank")},
+downloadBidReport(){if(this.currentBid)window.open(`${API}/bids/${this.currentBid.id}/report`,"_blank")},
+resultFor(bid,reqId){return (bid.results||[]).find(r=>r.requirement_id===reqId)},
+toggleVoice(){this.listening=!this.listening;if(this.listening&&"webkitSpeechRecognition" in window){let R=window.webkitSpeechRecognition;let r=new R();r.lang=this.language==="hi"?"hi-IN":this.language==="mr"?"mr-IN":this.language==="ta"?"ta-IN":this.language==="te"?"te-IN":"en-IN";r.onresult=e=>{this.chatInput=e.results[0][0].transcript;this.listening=false};r.onend=()=>this.listening=false;r.start()}else{setTimeout(()=>this.listening=false,1200)}},
+async runDeepAI(){if(!this.currentBid||this.aiBusy)return;this.aiBusy=true;try{this.aiAnalysis=await this.apiFetch(`/ai/analyze/${this.currentBid.id}`,{method:"POST"})}catch(e){alert("AI analysis failed: "+e.message)}finally{this.aiBusy=false}},
+async aiExtractRequirements(){let text=this.newTender.description||"";if(text.length<30)return alert("Add at least a tender clause/description first.");this.aiBusy=true;try{let d=await this.apiFetch("/ai/extract-requirements",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text})});(d.requirements||[]).forEach(r=>{this.newTender.requirements.push({name:r.name,rule_type:r.rule_type||"DOCUMENT_PRESENT",match_value:r.match_value||"",field_name:r.field_name||"",numeric_bound:r.numeric_bound,weight:1,is_mandatory:r.mandatory!==false})});if(d.requirements?.length)alert(`${d.requirements.length} AI-extracted requirements added. Review them before creating the tender.`)}catch(e){alert("AI extraction failed: "+e.message)}finally{this.aiBusy=false}},
+async reviewAction(action){if(!this.currentBid)return;let note=action==="APPROVE"?"Evaluator approved after review.":action==="REJECT"?"Evaluator rejected after review.":"Evaluator requested additional human review/clarification.";if(!confirm(`${action.replaceAll("_"," ")} this bid?`))return;try{this.currentBid=(await this.apiFetch(`/bids/${this.currentBid.id}/review-action`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action,note})})).bid;await this.loadBids();await this.loadTenders()}catch(e){alert(e.message)}},
+async ask(q){q=(q||"").trim();if(!q||this.chatLoading)return;this.messages.push({role:"user",text:q});this.chatInput="";this.chatLoading=true;try{const history=this.messages.slice(-11,-1);const d=await this.apiFetch("/ai/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:q,tender_id:this.currentTenderId||this.currentTender?.id||null,bid_id:this.currentBid?.id||null,language:this.language,history})});this.messages.push({role:"bot",text:d.answer,realAi:d.real_ai!==false});}catch(e){this.messages.push({role:"bot",text:`AI connection error: ${e.message}. Check the Vercel Function Logs for the exact provider error.`});}finally{this.chatLoading=false}}
+}
+}).mount("#app");
+</script>
+</body>
+</html>
